@@ -6,6 +6,7 @@ VERSION        = PUBSPEC["version"].to_s.split("+").first
 
 ENV["MATCH_TYPE"]                                = "appstore"
 ENV["MATCH_READONLY"]                            = "true"
+ENV["MATCH_CLONE_BRANCH_DIRECTLY"]               = "true"
 
 ENV["PILOT_IPA"]                                 = "build/ios/ipa/#{APP_NAME}.ipa"
 ENV["PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING"]   = "true"
