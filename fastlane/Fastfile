@@ -54,5 +54,5 @@ end
 # ── Error ────────────────────────────────────────────────────
 
 error do |lane, exception|
-  slack(message: exception.message, success: false) if ENV["SLACK_URL"]
+  slack(message: exception.message, success: false)
 end
