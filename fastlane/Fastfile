@@ -26,6 +26,7 @@ ENV["DELIVER_OVERWRITE_SCREENSHOTS"]             = "true"
 lane :deploy do
   deploy_ios
   deploy_android
+  slack
 end
 
 lane :deploy_ios do
