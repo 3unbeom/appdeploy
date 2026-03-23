@@ -9,5 +9,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - run: doppler run -p deploy -c prd -- fastlane ${{ inputs.lane }}
+    - run: |
+        mkdir -p fastlane
+        cp ${{ github.action_path }}/fastlane/Fastfile fastlane
+        doppler run -p deploy -c prd -- fastlane ${{ inputs.lane }}
       shell: bash

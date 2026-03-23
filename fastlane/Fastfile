@@ -2,6 +2,20 @@ PUBSPEC        = YAML.load_file("../pubspec.yaml")
 APP_NAME       = PUBSPEC["name"]
 VERSION        = PUBSPEC["version"].to_s.split("+").first
 
+# ── Appfile (auto-generated) ──────────────────────────────
+PACKAGE_NAME = File.read("../android/app/build.gradle.kts")
+                   .match(/applicationId\s*=\s*"(.+?)"/)[1]
+require 'xcodeproj'
+BUNDLE_ID    = Xcodeproj::Project.open("../ios/Runner.xcodeproj")
+                   .targets.first
+                   .build_configurations.first
+                   .build_settings["PRODUCT_BUNDLE_IDENTIFIER"]
+
+File.write("Appfile", <<~APPFILE)
+  app_identifier "#{BUNDLE_ID}"
+  package_name "#{PACKAGE_NAME}"
+APPFILE
+
 # ── Defaults ────────────────────────────────────────────────
 
 ENV["MATCH_TYPE"]                                = "appstore"
