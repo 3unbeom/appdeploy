@@ -5,22 +5,10 @@ inputs:
   lane:
     description: 'deploy, deploy_ios, deploy_android, metadata'
     default: 'deploy'
-  flutter-version:
-    description: 'Flutter version'
-    default: 'latest'
 
 runs:
   using: 'composite'
   steps:
-    - uses: jdx/mise-action@v4
-      with:
-        cache: false
-        mise_toml: |
-          [tools]
-          flutter = "${{ inputs.flutter-version }}"
-          ruby = "3.4"
-          "gem:cocoapods" = "latest"
-          "gem:fastlane" = "latest"
     - run: |
         doppler setup -p flutter-deploy -c prd --no-interactive
         doppler run -- fastlane ${{ inputs.lane }}
