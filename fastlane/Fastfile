@@ -5,7 +5,7 @@ APP_IDENTIFIER = File.read("../android/app/build.gradle.kts").match(/application
 
 # ── Defaults ────────────────────────────────────────────────
 
-ENV["FASTLANE_APP_IDENTIFIER"]                   = APP_IDENTIFIER
+CredentialsManager::AppfileConfig.new.data[:app_identifier] = APP_IDENTIFIER
 
 ENV["MATCH_TYPE"]                                = "appstore"
 ENV["MATCH_READONLY"]                            = "true"
