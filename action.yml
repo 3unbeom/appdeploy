@@ -18,5 +18,5 @@ runs:
           ruby = "3.4"
           "gem:cocoapods" = "latest"
           "gem:fastlane" = "latest"
-    - run: fastlane ${{ inputs.lane }}
+    - run: fastlane ${{ inputs.lane }} --fastfile ${{ github.action_path }}/Fastfile
       shell: bash
