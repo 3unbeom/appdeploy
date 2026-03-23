@@ -31,7 +31,7 @@ end
 lane :deploy_ios do
   setup_ci
   match
-  sh("flutter build ipa --build-number=#{app_store_build_number + 1}")
+  sh("flutter build ipa --build-number=#{latest_testflight_build_number + 1}")
   pilot
 end
 
