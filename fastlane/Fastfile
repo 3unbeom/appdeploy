@@ -1,8 +1,11 @@
-PUBSPEC  = YAML.load_file("../pubspec.yaml")
-APP_NAME = PUBSPEC["name"]
-VERSION  = PUBSPEC["version"].to_s.split("+").first
+PUBSPEC        = YAML.load_file("../pubspec.yaml")
+APP_NAME       = PUBSPEC["name"]
+VERSION        = PUBSPEC["version"].to_s.split("+").first
+APP_IDENTIFIER = File.read("../android/app/build.gradle").match(/applicationId\s+["'](.+?)["']/)[1]
 
 # ── Defaults ────────────────────────────────────────────────
+
+ENV["FASTLANE_APP_IDENTIFIER"]                   = APP_IDENTIFIER
 
 ENV["MATCH_TYPE"]                                = "appstore"
 ENV["MATCH_READONLY"]                            = "true"
