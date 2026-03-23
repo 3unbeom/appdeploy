@@ -5,6 +5,9 @@ inputs:
   lane:
     description: 'deploy, deploy_ios, deploy_android, metadata'
     default: 'deploy'
+  flutter-version:
+    description: 'Flutter version'
+    default: 'latest'
 
 runs:
   using: 'composite'
@@ -14,7 +17,7 @@ runs:
         cache: false
         mise_toml: |
           [tools]
-          flutter = "3.41.5"
+          flutter = "${{ inputs.flutter-version }}"
           ruby = "3.4"
           "gem:cocoapods" = "latest"
           "gem:fastlane" = "latest"
