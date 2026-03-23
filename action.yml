@@ -19,7 +19,6 @@ runs:
           "gem:cocoapods" = "latest"
           "gem:fastlane" = "latest"
     - run: |
-        mkdir -p fastlane
         cp "${{ github.action_path }}/Fastfile" fastlane
         doppler setup -p flutter-deploy -c prd --no-interactive
         doppler run -- fastlane ${{ inputs.lane }}

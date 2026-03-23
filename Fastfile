@@ -1,11 +1,8 @@
 PUBSPEC        = YAML.load_file("../pubspec.yaml")
 APP_NAME       = PUBSPEC["name"]
 VERSION        = PUBSPEC["version"].to_s.split("+").first
-APP_IDENTIFIER = File.read("../android/app/build.gradle.kts").match(/applicationId\s*=\s*"(.+?)"/)[1]
 
 # ── Defaults ────────────────────────────────────────────────
-
-CredentialsManager::AppfileConfig.new.data[:app_identifier] = APP_IDENTIFIER
 
 ENV["MATCH_TYPE"]                                = "appstore"
 ENV["MATCH_READONLY"]                            = "true"
