@@ -6,18 +6,22 @@ VERSION  = PUBSPEC["version"].to_s.split("+").first
 APP_ID   = File.read("../android/app/build.gradle.kts")
                .match(/applicationId\s*=\s*"(.+?)"/)[1]
 
+# ── Appfile ────────────────────────────────────────────────
+
+File.write("Appfile", <<~APPFILE)
+  app_identifier "#{APP_ID}"
+  package_name "#{APP_ID}"
+APPFILE
+
 # ── Defaults ────────────────────────────────────────────────
 
-ENV["MATCH_APP_IDENTIFIER"]                      = APP_ID
 ENV["MATCH_TYPE"]                                = "appstore"
 ENV["MATCH_READONLY"]                            = "true"
 ENV["MATCH_CLONE_BRANCH_DIRECTLY"]               = "true"
 
-ENV["PILOT_APP_IDENTIFIER"]                      = APP_ID
 ENV["PILOT_IPA"]                                 = "build/ios/ipa/#{APP_NAME}.ipa"
 ENV["PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING"]   = "true"
 
-ENV["DELIVER_APP_IDENTIFIER"]                    = APP_ID
 ENV["DELIVER_APP_VERSION"]                       = VERSION
 ENV["DELIVER_PRECHECK_INCLUDE_IN_APP_PURCHASES"] = "false"
 ENV["DELIVER_AUTOMATIC_RELEASE"]                 = "true"
@@ -25,7 +29,6 @@ ENV["DELIVER_SKIP_BINARY_UPLOAD"]                = "true"
 ENV["DELIVER_FORCE"]                             = "true"
 ENV["DELIVER_OVERWRITE_SCREENSHOTS"]             = "true"
 
-ENV["SUPPLY_PACKAGE_NAME"]                       = APP_ID
 ENV["SUPPLY_TRACK"]                              = "internal"
 ENV["SUPPLY_AAB"]                                = "build/app/outputs/bundle/release/app-release.aab"
 
