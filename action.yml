@@ -3,7 +3,7 @@ description: Build and deploy Flutter apps via Fastlane
 
 inputs:
   lane:
-    description: 'deploy, deploy_ios, deploy_android, metadata'
+    description: 'deploy, ios deploy, android deploy, ios beta'
     default: 'deploy'
 
 runs:

@@ -1,5 +1,7 @@
 # ── Constants ──────────────────────────────────────────────
 
+require 'json'
+
 PUBSPEC  = YAML.load_file("../pubspec.yaml")
 APP_NAME = PUBSPEC["name"]
 VERSION  = PUBSPEC["version"].to_s.split("+").first
@@ -8,6 +10,10 @@ APP_ID       = File.read("../android/app/build.gradle.kts")
 IPA_PATH     = "build/ios/ipa/#{APP_NAME}.ipa"
 AAB_PATH     = "build/app/outputs/bundle/release/app-release.aab"
 
+FIREBASE_CONFIG         = JSON.parse(File.read("../firebase.json"))
+FIREBASE_IOS_APP_ID     = FIREBASE_CONFIG.dig("flutter", "platforms", "ios", "default", "appId")
+FIREBASE_ANDROID_APP_ID = FIREBASE_CONFIG.dig("flutter", "platforms", "android", "default", "appId")
+
 # ── Appfile ────────────────────────────────────────────────
 
 File.write("Appfile", <<~APPFILE)
@@ -15,54 +21,31 @@ File.write("Appfile", <<~APPFILE)
   package_name "#{APP_ID}"
 APPFILE
 
-# ── Defaults ────────────────────────────────────────────────
-
-ENV["MATCH_TYPE"]                                ||= "appstore"
-ENV["MATCH_READONLY"]                            ||= "true"
-ENV["MATCH_CLONE_BRANCH_DIRECTLY"]               ||= "true"
-
-ENV["DELIVER_APP_VERSION"]                       ||= VERSION
-ENV["DELIVER_PRECHECK_INCLUDE_IN_APP_PURCHASES"] ||= "false"
-ENV["DELIVER_AUTOMATIC_RELEASE"]                 ||= "true"
-ENV["DELIVER_IPA_PATH"]                          ||= IPA_PATH
-ENV["DELIVER_FORCE"]                             ||= "true"
-ENV["DELIVER_OVERWRITE_SCREENSHOTS"]             ||= "true"
-
-ENV["SUPPLY_TRACK"]                              ||= "internal"
-ENV["SUPPLY_AAB"]                                ||= AAB_PATH
-
-ENV["FIREBASEAPPDISTRO_ANDROID_ARTIFACT_TYPE"]   ||= "AAB"
-
 # ── Lanes ────────────────────────────────────────────────────
 
 lane :deploy do
-  deploy_ios
-  deploy_android
+  Fastlane::LaneManager.cruise_lane("ios", "deploy")
+  Fastlane::LaneManager.cruise_lane("android", "deploy")
   slack
 end
 
-lane :deploy_ios do
-  setup_ci
-  match
-  sh("flutter build ipa --build-number=#{latest_testflight_build_number + 1}")
-  firebase_app_distribution(ipa_path: IPA_PATH)
+platform :ios do
+  lane :beta do
+    sh("flutter build ipa --export-method ad-hoc")
+    sh("firebase appdistribution:distribute ../#{IPA_PATH} --app #{FIREBASE_IOS_APP_ID} --groups testers")
+  end
+
+  lane :deploy do
+    sh("flutter build ipa --build-number=#{latest_testflight_build_number + 1}")
+    deliver(app_version: VERSION, ipa_path: IPA_PATH)
+  end
 end
 
-lane :deploy_android do
-  sh("flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
-  firebase_app_distribution(android_artifact_path: AAB_PATH)
-end
-
-lane :release do
-  setup_ci
-  match
-  sh("flutter build ipa --build-number=#{latest_testflight_build_number + 1}")
-  deliver
-
-  sh("flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
-  supply
-
-  slack
+platform :android do
+  lane :deploy do
+    sh("flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
+    supply(aab: AAB_PATH)
+  end
 end
 
 # ── Error ────────────────────────────────────────────────────
