@@ -5,10 +5,6 @@ inputs:
   lane:
     description: 'ios deploy, android deploy, ios beta'
     required: true
-  export_options:
-    description: 'Additional ExportOptions.plist entries as JSON (e.g. {"teamID":"XXXXXXXXXX","uploadBitcode":false,"compileBitcode":false})'
-    required: false
-    default: '{}'
 
 runs:
   using: 'composite'
@@ -19,5 +15,5 @@ runs:
         cp ${{ github.action_path }}/fastlane/Pluginfile fastlane
         cp ${{ github.action_path }}/Gemfile .
         bundle install
-        EXPORT_OPTIONS='${{ inputs.export_options }}' doppler run -p deploy -c flutter -- bundle exec fastlane ${{ inputs.lane }}
+        doppler run -p deploy -c flutter -- bundle exec fastlane ${{ inputs.lane }}
       shell: bash
