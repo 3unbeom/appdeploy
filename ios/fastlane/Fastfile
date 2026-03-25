@@ -1,0 +1,63 @@
+PUBSPEC  = YAML.load_file("../../pubspec.yaml")
+VERSION  = PUBSPEC["version"].to_s.split("+").first
+IPA_PATH = "../build/ios/ipa/#{ENV['APP_IDENTIFIER']}.ipa"
+
+def certificate_name(match_type)
+  ENV["sigh_#{ENV['APP_IDENTIFIER']}_#{match_type}_certificate-name"]
+end
+
+def generate_export_options(match_type)
+  path = File.join(Dir.tmpdir, "ExportOptions.plist")
+  File.write(path, {
+    "method"               => lane_context[SharedValues::SIGH_PROFILE_TYPE],
+    "signingStyle"         => "manual",
+    "signingCertificate"   => certificate_name(match_type),
+    "provisioningProfiles" => lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING],
+  }.to_plist)
+  path
+end
+
+platform :ios do
+  lane :beta do
+    type = "adhoc"
+    setup_ci
+    match(readonly: true, type: type, clone_branch_directly: true)
+    update_code_signing_settings(
+      path: "Runner.xcodeproj",
+      code_sign_identity: certificate_name(type),
+    )
+    sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
+    firebase_app_distribution(
+      ipa_path: IPA_PATH,
+      groups: "testers",
+      googleservice_info_plist_path: "Runner/GoogleService-Info.plist",
+      service_credentials_json_data: ENV["SUPPLY_JSON_KEY_DATA"],
+    )
+    slack
+  end
+
+  lane :deploy do
+    type = "appstore"
+    setup_ci
+    match(readonly: true, type: type, clone_branch_directly: true)
+    update_code_signing_settings(
+      path: "Runner.xcodeproj",
+      code_sign_identity: certificate_name(type),
+    )
+    build_number = latest_testflight_build_number + 1
+    sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)} --build-number=#{build_number}")
+    deliver(
+      ipa: IPA_PATH,
+      app_version: VERSION,
+      force: true,
+      automatic_release: true,
+      overwrite_screenshots: true,
+      precheck_include_in_app_purchases: false,
+    )
+    slack
+  end
+end
+
+error do |lane, exception|
+  slack(message: exception.message, success: false)
+end

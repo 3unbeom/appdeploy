@@ -1,0 +1,11 @@
+platform :android do
+  lane :deploy do
+    sh("cd ../.. && flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
+    supply(aab: "../build/app/outputs/bundle/release/app-release.aab")
+    slack
+  end
+end
+
+error do |lane, exception|
+  slack(message: exception.message, success: false)
+end

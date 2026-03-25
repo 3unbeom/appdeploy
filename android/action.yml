@@ -1,0 +1,23 @@
+name: Flutter Android Deploy
+description: Build and deploy Flutter Android apps via Fastlane
+
+inputs:
+  lane:
+    description: 'deploy'
+    default: 'deploy'
+  package_name:
+    description: 'Android package name (e.g. com.example.app)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - env:
+        BUNDLE_GEMFILE: ${{ github.action_path }}/Gemfile
+        SUPPLY_PACKAGE_NAME: ${{ inputs.package_name }}
+      run: |
+        bundle install
+        mkdir -p android/fastlane
+        echo "import '${{ github.action_path }}/fastlane/Fastfile'" > android/fastlane/Fastfile
+        doppler run -p deploy -c flutter -- bundle exec fastlane android ${{ inputs.lane }}
+      shell: bash

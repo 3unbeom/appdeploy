@@ -1,0 +1,23 @@
+name: Flutter iOS Deploy
+description: Build and deploy Flutter iOS apps via Fastlane
+
+inputs:
+  lane:
+    description: 'deploy, beta'
+    default: 'deploy'
+  bundle_id:
+    description: 'iOS bundle identifier (e.g. com.example.app)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - env:
+        BUNDLE_GEMFILE: ${{ github.action_path }}/Gemfile
+        APP_IDENTIFIER: ${{ inputs.bundle_id }}
+      run: |
+        bundle install
+        mkdir -p ios/fastlane
+        echo "import '${{ github.action_path }}/fastlane/Fastfile'" > ios/fastlane/Fastfile
+        doppler run -p deploy -c flutter -- bundle exec fastlane ios ${{ inputs.lane }}
+      shell: bash
