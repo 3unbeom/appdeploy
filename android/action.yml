@@ -14,5 +14,6 @@ runs:
       run: |
         bundle install
         echo "import '${{ github.action_path }}/fastlane/Fastfile'" > android/fastlane/Fastfile
+        cd android
         doppler run -p deploy -c flutter -- bundle exec fastlane android ${{ inputs.lane }}
       shell: bash
