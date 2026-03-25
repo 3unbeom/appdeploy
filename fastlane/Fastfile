@@ -15,9 +15,6 @@ def generate_export_options(method:)
     "provisioningProfiles" => lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING],
   }
 
-  manual = JSON.parse(ENV.fetch("EXPORT_OPTIONS", "{}"))
-  plist.merge!(manual)
-
   path = File.join(Dir.tmpdir, "ExportOptions.plist")
   File.write(path, plist.to_plist)
   path
