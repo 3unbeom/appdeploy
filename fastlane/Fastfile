@@ -13,7 +13,6 @@ def generate_export_options(method:)
     "method"               => method,
     "signingStyle"         => "manual",
     "signingCertificate"   => "Apple Distribution",
-    "teamID"               => ENV["TEAM_ID"],
     "provisioningProfiles" => lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING],
   }
 
