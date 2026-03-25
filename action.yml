@@ -12,5 +12,8 @@ runs:
     - run: |
         mkdir -p fastlane
         cp ${{ github.action_path }}/fastlane/Fastfile fastlane
-        doppler run -p deploy -c flutter -- fastlane ${{ inputs.lane }}
+        cp ${{ github.action_path }}/fastlane/Pluginfile fastlane
+        cp ${{ github.action_path }}/Gemfile .
+        bundle install
+        doppler run -p deploy -c flutter -- bundle exec fastlane ${{ inputs.lane }}
       shell: bash
