@@ -29,7 +29,6 @@ platform :ios do
     match(type: "adhoc", readonly: true)
     update_code_signing_settings(
       use_automatic_signing: false,
-      team_id: ENV["TEAM_ID"],
       profile_name: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING].values.first,
     )
     export_plist = generate_export_options(method: "ad-hoc")
@@ -47,7 +46,6 @@ platform :ios do
     match(type: "appstore", readonly: true)
     update_code_signing_settings(
       use_automatic_signing: false,
-      team_id: ENV["TEAM_ID"],
       profile_name: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING].values.first,
     )
     build_number = latest_testflight_build_number + 1
