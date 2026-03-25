@@ -20,7 +20,7 @@ end
 platform :ios do
   lane :beta do
     setup_ci
-    match(type: "adhoc")
+    match(type: "adhoc", readonly: true)
     sh("flutter build ios --no-codesign")
     gym(export_method: "ad-hoc")
     sh("firebase appdistribution:distribute " \
@@ -30,7 +30,7 @@ platform :ios do
 
   lane :deploy do
     setup_ci
-    match(type: "appstore")
+    match(type: "appstore", readonly: true)
     build_number = latest_testflight_build_number + 1
     sh("flutter build ios --no-codesign --build-number=#{build_number}")
     gym(export_method: "app-store")
