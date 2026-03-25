@@ -55,7 +55,10 @@ platform :ios do
     )
     update_code_signing_settings(
       path: "Runner.xcodeproj",
+      targets: "Runner",
+      build_configurations: "Release",
       code_sign_identity: certificate_name(type),
+      profile_name: profile_name(type),
     )
     build_number = latest_testflight_build_number + 1
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)} --build-number=#{build_number}")
