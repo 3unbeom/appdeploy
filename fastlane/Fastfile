@@ -11,6 +11,7 @@ IPA_PATH = "build/ios/ipa/#{APP_NAME}.ipa"
 def generate_export_options(method:)
   plist = {
     "method"               => method,
+    "signingStyle"         => "manual",
     "provisioningProfiles" => lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING],
   }
 
