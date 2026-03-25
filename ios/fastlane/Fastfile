@@ -24,8 +24,8 @@ platform :ios do
     type = "adhoc"
     setup_ci
     match(
-      readonly: true,
       type: type,
+      readonly: true,
       clone_branch_directly: true,
     )
     update_code_signing_settings(
@@ -39,8 +39,8 @@ platform :ios do
     firebase_app_distribution(
       ipa_path: Dir.glob("../build/ios/ipa/*.ipa").first,
       groups: "testers",
-      googleservice_info_plist_path: "Runner/GoogleService-Info.plist",
       service_credentials_json_data: ENV["SUPPLY_JSON_KEY_DATA"],
+      googleservice_info_plist_path: "Runner/GoogleService-Info.plist",
     )
     slack
   end
@@ -49,8 +49,8 @@ platform :ios do
     type = "appstore"
     setup_ci
     match(
-      readonly: true,
       type: type,
+      readonly: true,
       clone_branch_directly: true,
     )
     update_code_signing_settings(
