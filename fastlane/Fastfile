@@ -27,7 +27,11 @@ platform :ios do
   lane :beta do
     setup_ci
     match(type: "adhoc", readonly: true)
-    update_code_signing_settings(use_automatic_signing: false)
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      team_id: ENV["TEAM_ID"],
+      profile_name: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING].values.first,
+    )
     export_plist = generate_export_options(method: "ad-hoc")
     sh("flutter build ipa --export-options-plist=#{export_plist}")
     firebase_app_distribution(
@@ -41,7 +45,11 @@ platform :ios do
   lane :deploy do
     setup_ci
     match(type: "appstore", readonly: true)
-    update_code_signing_settings(use_automatic_signing: false)
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      team_id: ENV["TEAM_ID"],
+      profile_name: lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING].values.first,
+    )
     build_number = latest_testflight_build_number + 1
     export_plist = generate_export_options(method: "app-store")
     sh("flutter build ipa --export-options-plist=#{export_plist} --build-number=#{build_number}")
