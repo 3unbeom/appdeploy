@@ -1,27 +1,22 @@
-# ── Constants ──────────────────────────────────────────────
+# ── Setup ──────────────────────────────────────────────────
 
 require 'json'
 
 PUBSPEC  = YAML.load_file("../pubspec.yaml")
 APP_NAME = PUBSPEC["name"]
 VERSION  = PUBSPEC["version"].to_s.split("+").first
-APP_ID       = File.read("../android/app/build.gradle.kts")
-                   .match(/applicationId\s*=\s*"(.+?)"/)[1]
-IPA_PATH     = "build/ios/ipa/#{APP_NAME}.ipa"
-AAB_PATH     = "build/app/outputs/bundle/release/app-release.aab"
-
-FIREBASE_CONFIG         = JSON.parse(File.read("../firebase.json"))
-FIREBASE_IOS_APP_ID     = FIREBASE_CONFIG.dig("flutter", "platforms", "ios", "default", "appId")
-FIREBASE_ANDROID_APP_ID = FIREBASE_CONFIG.dig("flutter", "platforms", "android", "default", "appId")
-
-# ── Appfile ────────────────────────────────────────────────
+APP_ID   = File.read("../android/app/build.gradle.kts").match(/applicationId\s*=\s*"(.+?)"/)[1]
 
 File.write("Appfile", <<~APPFILE)
   app_identifier "#{APP_ID}"
   package_name "#{APP_ID}"
 APPFILE
 
-# ── Lanes ────────────────────────────────────────────────────
+FIREBASE         = JSON.parse(File.read("../firebase.json"))
+FIREBASE_IOS     = FIREBASE.dig("flutter", "platforms", "ios", "default", "appId")
+FIREBASE_ANDROID = FIREBASE.dig("flutter", "platforms", "android", "default", "appId")
+
+# ── Lanes ──────────────────────────────────────────────────
 
 lane :deploy do
   Fastlane::LaneManager.cruise_lane("ios", "deploy")
@@ -31,24 +26,33 @@ end
 
 platform :ios do
   lane :beta do
-    sh("flutter build ipa --export-method ad-hoc")
-    sh("firebase appdistribution:distribute ../#{IPA_PATH} --app #{FIREBASE_IOS_APP_ID} --groups testers")
+    setup_ci
+    match(type: "adhoc", readonly: true)
+    sh("flutter build ios --no-codesign")
+    gym(export_method: "ad-hoc")
+    sh("firebase appdistribution:distribute " \
+       "#{lane_context[SharedValues::IPA_OUTPUT_PATH]} " \
+       "--app #{FIREBASE_IOS} --groups testers")
   end
 
   lane :deploy do
-    sh("flutter build ipa --build-number=#{latest_testflight_build_number + 1}")
-    deliver(app_version: VERSION, ipa_path: IPA_PATH)
+    setup_ci
+    match(type: "appstore", readonly: true)
+    build_number = latest_testflight_build_number + 1
+    sh("flutter build ios --no-codesign --build-number=#{build_number}")
+    gym(export_method: "app-store")
+    deliver(app_version: VERSION)
   end
 end
 
 platform :android do
   lane :deploy do
     sh("flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
-    supply(aab: AAB_PATH)
+    supply
   end
 end
 
-# ── Error ────────────────────────────────────────────────────
+# ── Error ──────────────────────────────────────────────────
 
 error do |lane, exception|
   slack(message: exception.message, success: false)
