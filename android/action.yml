@@ -5,15 +5,35 @@ inputs:
   lane:
     description: 'deploy'
     default: 'deploy'
+  app_id:
+    description: 'App identifier (e.g. com.example.app)'
+    default: ''
 
 runs:
   using: 'composite'
   steps:
-    - env:
-        BUNDLE_GEMFILE: ${{ github.action_path }}/Gemfile
+    - name: Install tools
+      uses: jdx/mise-action@v4
+      with:
+        install_args: flutter@3.41.5 ruby@latest
+
+    - run: echo "BUNDLE_GEMFILE=${{ github.action_path }}/Gemfile" >> "$GITHUB_ENV"
+      shell: bash
+
+    - run: bundle install
+      shell: bash
+
+    - name: Setup fastlane
+      working-directory: android
       run: |
-        bundle install
-        echo "import '${{ github.action_path }}/fastlane/Fastfile'" > android/fastlane/Fastfile
-        cd android
-        doppler run -p deploy -c flutter -- bundle exec fastlane android ${{ inputs.lane }}
+        mkdir -p fastlane
+        echo "import '${{ github.action_path }}/fastlane/Fastfile'" > fastlane/Fastfile
+        if [ -n "${{ inputs.app_id }}" ]; then
+          echo 'package_name("${{ inputs.app_id }}")' > fastlane/Appfile
+        fi
+      shell: bash
+
+    - name: Deploy
+      working-directory: android
+      run: doppler run -p deploy -c flutter -- bundle exec fastlane android ${{ inputs.lane }}
       shell: bash
