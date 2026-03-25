@@ -3,14 +3,7 @@
 require 'json'
 
 PUBSPEC  = YAML.load_file("../pubspec.yaml")
-APP_NAME = PUBSPEC["name"]
 VERSION  = PUBSPEC["version"].to_s.split("+").first
-APP_ID   = File.read("../android/app/build.gradle.kts").match(/applicationId\s*=\s*"(.+?)"/)[1]
-
-File.write("Appfile", <<~APPFILE)
-  app_identifier "#{APP_ID}"
-  package_name "#{APP_ID}"
-APPFILE
 
 FIREBASE         = JSON.parse(File.read("../firebase.json"))
 FIREBASE_IOS     = FIREBASE.dig("flutter", "platforms", "ios", "default", "appId")
