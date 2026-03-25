@@ -1,9 +1,14 @@
 PUBSPEC  = YAML.load_file("../../pubspec.yaml")
 VERSION  = PUBSPEC["version"].to_s.split("+").first
+APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 IPA_PATH = "../build/ios/ipa/#{ENV['APP_IDENTIFIER']}.ipa"
 
 def certificate_name(match_type)
-  ENV["sigh_#{ENV['APP_IDENTIFIER']}_#{match_type}_certificate-name"]
+  ENV["sigh_#{APP_IDENTIFIER}_#{match_type}_certificate-name"]
+end
+
+def profile_name(match_type)
+  ENV["sigh_#{APP_IDENTIFIER}_#{match_type}_profile-name"]
 end
 
 def generate_export_options(match_type)
@@ -24,7 +29,10 @@ platform :ios do
     match(readonly: true, type: type, clone_branch_directly: true)
     update_code_signing_settings(
       path: "Runner.xcodeproj",
+      targets: "Runner",
+      build_configurations: "Release",
       code_sign_identity: certificate_name(type),
+      profile_name: profile_name(type),
     )
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
     firebase_app_distribution(

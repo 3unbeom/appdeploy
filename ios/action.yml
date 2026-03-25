@@ -5,16 +5,12 @@ inputs:
   lane:
     description: 'deploy, beta'
     default: 'deploy'
-  bundle_id:
-    description: 'iOS bundle identifier (e.g. com.example.app)'
-    required: true
 
 runs:
   using: 'composite'
   steps:
     - env:
         BUNDLE_GEMFILE: ${{ github.action_path }}/Gemfile
-        APP_IDENTIFIER: ${{ inputs.bundle_id }}
       run: |
         bundle install
         mkdir -p ios/fastlane
