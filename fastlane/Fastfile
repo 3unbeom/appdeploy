@@ -12,6 +12,7 @@ def generate_export_options(method:)
   plist = {
     "method"               => method,
     "signingStyle"         => "manual",
+    "teamID"               => ENV["TEAM_ID"],
     "provisioningProfiles" => lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING],
   }
 
