@@ -1,0 +1,6 @@
+[tools]
+flutter = "3.41.5"
+ruby = "latest"
+"gem:cocoapods" = "latest"
+"gem:fastlane" = "latest"
+"gem:fastlane-plugin-firebase_app_distribution" = "latest"

@@ -1,0 +1,4 @@
+[tools]
+flutter = "3.41.5"
+ruby = "latest"
+"gem:fastlane" = "latest"

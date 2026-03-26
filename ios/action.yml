@@ -15,14 +15,8 @@ runs:
     - name: Install tools
       uses: jdx/mise-action@v4
       with:
-        install_args: flutter@3.41.5 ruby@latest
+        mise_toml: ${{ github.action_path }}/mise.toml
         cache: false
-
-    - run: echo "BUNDLE_GEMFILE=${{ github.action_path }}/Gemfile" >> "$GITHUB_ENV"
-      shell: bash
-
-    - run: bundle install
-      shell: bash
 
     - name: Setup fastlane
       working-directory: ios
@@ -36,5 +30,5 @@ runs:
 
     - name: Deploy
       working-directory: ios
-      run: doppler run -p deploy -c flutter -- bundle exec fastlane ios ${{ inputs.lane }}
+      run: doppler run -p deploy -c flutter -- fastlane ios ${{ inputs.lane }}
       shell: bash
