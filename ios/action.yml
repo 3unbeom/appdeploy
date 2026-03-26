@@ -5,9 +5,6 @@ inputs:
   lane:
     description: 'deploy, beta'
     default: 'deploy'
-  doppler_token:
-    description: 'Doppler service token'
-    required: true
 
 runs:
   using: 'composite'
@@ -27,8 +24,7 @@ runs:
     - name: Deploy
       working-directory: ios
       run: |
+        mkdir -p fastlane
         echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
-        doppler run -- fastlane ios ${{ inputs.lane }}
+        doppler run -p deploy -c flutter -- fastlane ios ${{ inputs.lane }}
       shell: bash
-      env:
-        DOPPLER_TOKEN: ${{ inputs.doppler_token }}
