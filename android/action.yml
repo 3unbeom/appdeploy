@@ -19,6 +19,9 @@ runs:
           "gem:fastlane" = "latest"
         cache: false
 
+    - name: Install Doppler CLI
+      uses: dopplerhq/cli-action@v4
+
     - name: Deploy
       working-directory: android
       run: |

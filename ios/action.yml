@@ -21,6 +21,9 @@ runs:
           "gem:fastlane-plugin-firebase_app_distribution" = "latest"
         cache: false
 
+    - name: Install Doppler CLI
+      uses: dopplerhq/cli-action@v4
+
     - name: Deploy
       working-directory: ios
       run: |
