@@ -40,7 +40,7 @@ platform :ios do
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
     firebase_app_distribution(
       ipa_path: File.expand_path(Dir.glob("../../build/ios/ipa/*.ipa").first),
-      release_notes: changelog_from_git_commits,
+      release_notes: changelog_from_git_commits(commits_count: 3),
       groups: "testers",
       service_credentials_json_data: ENV["SUPPLY_JSON_KEY_DATA"],
       googleservice_info_plist_path: "Runner/GoogleService-Info.plist",
