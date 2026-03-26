@@ -5,9 +5,6 @@ inputs:
   lane:
     description: 'deploy'
     default: 'deploy'
-  app_id:
-    description: 'App identifier (e.g. com.example.app)'
-    default: ''
 
 runs:
   using: 'composite'
@@ -27,8 +24,8 @@ runs:
       run: |
         mkdir -p fastlane
         echo "import '${{ github.action_path }}/fastlane/Fastfile'" > fastlane/Fastfile
-        if [ -n "${{ inputs.app_id }}" ]; then
-          echo 'package_name("${{ inputs.app_id }}")' > fastlane/Appfile
+        if [ -n "$APP_IDENTIFIER" ]; then
+          echo "package_name \"$APP_IDENTIFIER\"" > fastlane/Appfile
         fi
       shell: bash
 
