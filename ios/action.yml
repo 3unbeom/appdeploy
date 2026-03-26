@@ -17,7 +17,7 @@ runs:
       with:
         mise_toml: |
           [tools]
-          flutter = "3.41.5"
+          flutter = "latest"
           ruby = "latest"
           "gem:cocoapods" = "latest"
           "gem:fastlane" = "latest"
