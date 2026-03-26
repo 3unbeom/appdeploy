@@ -21,17 +21,9 @@ runs:
           "gem:fastlane-plugin-firebase_app_distribution" = "latest"
         cache: false
 
-    - name: Setup fastlane
-      working-directory: ios
-      run: |
-        mkdir -p fastlane
-        echo "import '${{ github.action_path }}/fastlane/Fastfile'" > fastlane/Fastfile
-        if [ -n "$APP_IDENTIFIER" ]; then
-          echo "app_identifier \"$APP_IDENTIFIER\"" > fastlane/Appfile
-        fi
-      shell: bash
-
     - name: Deploy
       working-directory: ios
-      run: doppler run -p deploy -c flutter -- fastlane ios ${{ inputs.lane }}
+      run: |
+        echo "import '${{ github.action_path }}/Fastfile'" > fastlane
+        doppler run -p deploy -c flutter -- fastlane ios ${{ inputs.lane }}
       shell: bash

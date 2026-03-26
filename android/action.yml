@@ -19,17 +19,9 @@ runs:
           "gem:fastlane" = "latest"
         cache: false
 
-    - name: Setup fastlane
-      working-directory: android
-      run: |
-        mkdir -p fastlane
-        echo "import '${{ github.action_path }}/fastlane/Fastfile'" > fastlane/Fastfile
-        if [ -n "$APP_IDENTIFIER" ]; then
-          echo "package_name \"$APP_IDENTIFIER\"" > fastlane/Appfile
-        fi
-      shell: bash
-
     - name: Deploy
       working-directory: android
-      run: doppler run -p deploy -c flutter -- fastlane android ${{ inputs.lane }}
+      run: |
+        echo "import '${{ github.action_path }}/Fastfile'" > fastlane
+        doppler run -p deploy -c flutter -- fastlane android ${{ inputs.lane }}
       shell: bash
