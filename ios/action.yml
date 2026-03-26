@@ -24,6 +24,7 @@ runs:
     - name: Deploy
       working-directory: ios
       run: |
-        echo "import '${{ github.action_path }}/Fastfile'" > fastlane
+        mkdir -p fastlane
+        echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
         doppler run -p deploy -c flutter -- fastlane ios ${{ inputs.lane }}
       shell: bash
