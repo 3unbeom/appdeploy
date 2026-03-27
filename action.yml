@@ -18,7 +18,7 @@ runs:
     - name: Install tools
       run: |
         mise use flutter@3 ruby@4 gem:fastlane@2
-        if [[ "${{ inputs.platform }}" == "ios" || "${{ inputs.platform }}" == "all" ]]; then
+        if [[ "ios,all" == *"${{ inputs.platform }}"* ]]; then
           mise use gem:cocoapods@1
         fi
         if [[ "${{ inputs.lane }}" == "distribution" ]]; then
@@ -30,7 +30,7 @@ runs:
       uses: dopplerhq/cli-action@v4
 
     - name: Deploy Android
-      if: inputs.platform == 'android' || inputs.platform == 'all'
+      if: contains('android,all', inputs.platform)
       working-directory: android
       run: |
         echo "import '${{ github.action_path }}/android/Fastfile'" > fastlane/Fastfile
@@ -38,7 +38,7 @@ runs:
       shell: bash
 
     - name: Deploy iOS
-      if: inputs.platform == 'ios' || inputs.platform == 'all'
+      if: contains('ios,all', inputs.platform)
       working-directory: ios
       run: |
         echo "import '${{ github.action_path }}/ios/Fastfile'" > fastlane/Fastfile
