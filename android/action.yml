@@ -24,8 +24,7 @@ runs:
       uses: dopplerhq/cli-action@v4
 
     - name: Import Fastfile
-      working-directory: android
-      run: echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
+      run: echo "import '${{ github.action_path }}/Fastfile'" > android/fastlane/Fastfile
       shell: bash
 
     - name: Deploy
