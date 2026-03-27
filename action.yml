@@ -4,10 +4,10 @@ description: Build and deploy Flutter apps via Fastlane
 inputs:
   android:
     description: 'Deploy Android'
-    default: 'true'
+    default: true
   ios:
     description: 'Deploy iOS'
-    default: 'true'
+    default: true
   lane:
     description: 'release, beta'
     default: 'release'
@@ -21,7 +21,7 @@ runs:
     - name: Install tools
       run: |
         mise use flutter@3 ruby@4 gem:fastlane@2
-        if [[ "${{ inputs.ios }}" == "true" ]]; then
+        if [[ "${{ inputs.ios }}" != "false" ]]; then
           mise use gem:cocoapods@1
         fi
         if [[ "${{ inputs.lane }}" == "beta" ]]; then
@@ -33,7 +33,7 @@ runs:
       uses: dopplerhq/cli-action@v4
 
     - name: Deploy Android
-      if: inputs.android == 'true'
+      if: inputs.android
       working-directory: android
       run: |
         echo "import '${{ github.action_path }}/android.rb'" > fastlane/Fastfile
@@ -41,7 +41,7 @@ runs:
       shell: bash
 
     - name: Deploy iOS
-      if: inputs.ios == 'true'
+      if: inputs.ios
       working-directory: ios
       run: |
         echo "import '${{ github.action_path }}/ios.rb'" > fastlane/Fastfile
