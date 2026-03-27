@@ -22,7 +22,7 @@ runs:
           mise use gem:cocoapods@1
         fi
         if [[ "${{ inputs.lane }}" == "distribution" ]]; then
-          mise use gem:fastlane-plugin-firebase_app_distribution@latest
+          mise use gem:fastlane-plugin-firebase_app_distribution@1
         fi
       shell: bash
 
