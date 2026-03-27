@@ -19,8 +19,24 @@ runs:
           [tools]
           flutter = "latest"
           ruby = "latest"
-          "gem:cocoapods" = "latest"
           "gem:fastlane" = "latest"
+        cache: false
+
+    - name: Install CocoaPods
+      if: inputs.platform == 'ios' || inputs.platform == 'all'
+      uses: jdx/mise-action@v4
+      with:
+        mise_toml: |
+          [tools]
+          "gem:cocoapods" = "latest"
+        cache: false
+
+    - name: Install Firebase App Distribution plugin
+      if: inputs.lane == 'distribution'
+      uses: jdx/mise-action@v4
+      with:
+        mise_toml: |
+          [tools]
           "gem:fastlane-plugin-firebase_app_distribution" = "latest"
         cache: false
 
