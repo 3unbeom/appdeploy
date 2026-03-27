@@ -19,14 +19,17 @@ runs:
       uses: jdx/mise-action@v4
 
     - name: Install tools
-      run: |
-        mise use flutter@3 ruby@4 gem:fastlane@2
-        if [[ "${{ inputs.ios }}" != "false" ]]; then
-          mise use gem:cocoapods@1
-        fi
-        if [[ "${{ inputs.lane }}" == "beta" ]]; then
-          mise use gem:fastlane-plugin-firebase_app_distribution@1
-        fi
+      run: mise use flutter@3 ruby@4 gem:fastlane@2
+      shell: bash
+
+    - name: Install CocoaPods
+      if: inputs.ios
+      run: mise use gem:cocoapods@1
+      shell: bash
+
+    - name: Install Firebase plugin
+      if: inputs.lane == 'beta'
+      run: mise use gem:fastlane-plugin-firebase_app_distribution@1
       shell: bash
 
     - name: Install Doppler CLI
