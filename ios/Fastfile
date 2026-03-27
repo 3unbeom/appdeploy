@@ -22,8 +22,8 @@ def generate_export_options(match_type)
 end
 
 platform :ios do
-  lane :beta do
-    type = "adhoc"
+  private_lane :setup_signing do |options|
+    type = options[:type]
     setup_ci
     match(
       type: type,
@@ -37,6 +37,11 @@ platform :ios do
       code_sign_identity: certificate_name(type),
       profile_name: profile_name(type),
     )
+    type
+  end
+
+  lane :beta do
+    type = setup_signing(type: "adhoc")
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
     firebase_app_distribution(
       ipa_path: File.expand_path(Dir.glob("../../build/ios/ipa/*.ipa").first),
@@ -49,20 +54,7 @@ platform :ios do
   end
 
   lane :deploy do
-    type = "appstore"
-    setup_ci
-    match(
-      type: type,
-      readonly: true,
-      clone_branch_directly: true,
-    )
-    update_code_signing_settings(
-      path: "Runner.xcodeproj",
-      targets: "Runner",
-      build_configurations: "Release",
-      code_sign_identity: certificate_name(type),
-      profile_name: profile_name(type),
-    )
+    type = setup_signing(type: "appstore")
     build_number = latest_testflight_build_number + 1
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)} --build-number=#{build_number}")
     deliver(
