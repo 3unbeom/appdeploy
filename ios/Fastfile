@@ -37,11 +37,11 @@ platform :ios do
       code_sign_identity: certificate_name(type),
       profile_name: profile_name(type),
     )
-    type
   end
 
   lane :beta do
-    type = setup_signing(type: "adhoc")
+    type = "adhoc"
+    setup_signing(type: type)
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
     firebase_app_distribution(
       ipa_path: File.expand_path(Dir.glob("../../build/ios/ipa/*.ipa").first),
@@ -54,7 +54,8 @@ platform :ios do
   end
 
   lane :deploy do
-    type = setup_signing(type: "appstore")
+    type = "appstore"
+    setup_signing(type: type)
     build_number = latest_testflight_build_number + 1
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)} --build-number=#{build_number}")
     deliver(
