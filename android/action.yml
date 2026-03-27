@@ -17,6 +17,7 @@ runs:
           flutter = "latest"
           ruby = "latest"
           "gem:fastlane" = "latest"
+          "gem:fastlane-plugin-firebase_app_distribution" = "latest"
         cache: false
 
     - name: Install Doppler CLI
