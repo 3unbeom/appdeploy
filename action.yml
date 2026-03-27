@@ -1,0 +1,43 @@
+name: Flutter Deploy
+description: Build and deploy Flutter apps via Fastlane
+
+inputs:
+  platform:
+    description: 'android, ios, all'
+    default: 'all'
+  lane:
+    description: 'release, beta'
+    default: 'release'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: dopplerhq/cli-action@v4
+    - uses: jdx/mise-action@v4
+      with:
+        cache: false
+
+    - run: mise use flutter@3 ruby@4 gem:fastlane@2
+      shell: bash
+
+    - if: inputs.platform != 'android'
+      run: mise use gem:cocoapods@1
+      shell: bash
+
+    - if: inputs.lane == 'beta'
+      run: mise use gem:fastlane-plugin-firebase_app_distribution@1
+      shell: bash
+
+    - if: inputs.platform != 'ios'
+      working-directory: android
+      run: |
+        echo "import '${{ github.action_path }}/android/Fastfile'" > fastlane/Fastfile
+        doppler run -- fastlane android ${{ inputs.lane }}
+      shell: bash
+
+    - if: inputs.platform != 'android'
+      working-directory: ios
+      run: |
+        echo "import '${{ github.action_path }}/ios/Fastfile'" > fastlane/Fastfile
+        doppler run -- fastlane ios ${{ inputs.lane }}
+      shell: bash

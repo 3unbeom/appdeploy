@@ -1,0 +1,80 @@
+APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+
+def certificate_name(match_type)
+  ENV["sigh_#{APP_IDENTIFIER}_#{match_type}_certificate-name"]
+end
+
+def profile_name(match_type)
+  ENV["sigh_#{APP_IDENTIFIER}_#{match_type}_profile-name"]
+end
+
+def generate_export_options(match_type)
+  path = File.join(Dir.tmpdir, "ExportOptions.plist")
+  File.write(path, {
+    "method"               => lane_context[SharedValues::SIGH_PROFILE_TYPE],
+    "signingStyle"         => "manual",
+    "signingCertificate"   => certificate_name(match_type),
+    "provisioningProfiles" => lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING],
+  }.to_plist)
+  path
+end
+
+IPA_PATH = "../../build/ios/ipa/*.ipa"
+
+platform :ios do
+  before_all do
+    setup_ci
+  end
+
+  private_lane :setup_signing do |options|
+    type = options[:type]
+    match(
+      type: type,
+      readonly: true,
+      clone_branch_directly: true,
+    )
+    update_code_signing_settings(
+      path: "Runner.xcodeproj",
+      targets: "Runner",
+      build_configurations: "Release",
+      code_sign_identity: certificate_name(type),
+      profile_name: profile_name(type),
+    )
+  end
+
+  lane :beta do
+    require 'fastlane/plugin/firebase_app_distribution'
+    type = "adhoc"
+    setup_signing(type: type)
+    sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
+    firebase_app_distribution(
+      ipa_path: File.expand_path(Dir.glob(IPA_PATH).first),
+      release_notes: changelog_from_git_commits(commits_count: 3),
+      groups: "testers",
+      service_credentials_json_data: ENV["SUPPLY_JSON_KEY_DATA"],
+      googleservice_info_plist_path: "Runner/GoogleService-Info.plist",
+    )
+    slack
+  end
+
+  lane :release do
+    type = "appstore"
+    setup_signing(type: type)
+    build_number = latest_testflight_build_number + 1
+    sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)} --build-number=#{build_number}")
+    deliver(
+      ipa: File.expand_path(Dir.glob(IPA_PATH).first),
+      app_version: YAML.load_file("../../pubspec.yaml")["version"].to_s.split("+").first,
+      force: true,
+      automatic_release: true,
+      overwrite_screenshots: true,
+      precheck_include_in_app_purchases: false,
+      submit_for_review: true,
+    )
+    slack
+  end
+end
+
+error do |lane, exception|
+  slack(message: exception.message, success: false)
+end
