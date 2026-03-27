@@ -9,8 +9,8 @@ inputs:
     description: 'Deploy iOS'
     default: 'true'
   lane:
-    description: 'store, distribution'
-    default: 'store'
+    description: 'release, beta'
+    default: 'release'
 
 runs:
   using: 'composite'
@@ -24,7 +24,7 @@ runs:
         if [[ "${{ inputs.ios }}" == "true" ]]; then
           mise use gem:cocoapods@1
         fi
-        if [[ "${{ inputs.lane }}" == "distribution" ]]; then
+        if [[ "${{ inputs.lane }}" == "beta" ]]; then
           mise use gem:fastlane-plugin-firebase_app_distribution@1
         fi
       shell: bash

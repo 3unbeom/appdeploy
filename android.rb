@@ -1,7 +1,7 @@
 require 'fastlane/plugin/firebase_app_distribution'
 
 platform :android do
-  lane :distribution do
+  lane :beta do
     sh("cd ../.. && flutter build apk")
     firebase_app_distribution(
       apk_path: "../build/app/outputs/flutter-apk/app-release.apk",
@@ -12,7 +12,7 @@ platform :android do
     slack
   end
 
-  lane :store do
+  lane :release do
     sh("cd ../.. && flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
     supply(aab: "../build/app/outputs/bundle/release/app-release.aab")
     slack

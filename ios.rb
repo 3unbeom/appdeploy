@@ -44,7 +44,7 @@ platform :ios do
     )
   end
 
-  lane :distribution do
+  lane :beta do
     type = "adhoc"
     setup_signing(type: type)
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
@@ -58,7 +58,7 @@ platform :ios do
     slack
   end
 
-  lane :store do
+  lane :release do
     type = "appstore"
     setup_signing(type: type)
     build_number = latest_testflight_build_number + 1
