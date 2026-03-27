@@ -24,19 +24,15 @@ runs:
     - name: Install Doppler CLI
       uses: dopplerhq/cli-action@v4
 
-    - name: Import Android Fastfile
-      working-directory: android
-      run: echo "import '${{ github.action_path }}/android/Fastfile'" > fastlane/Fastfile
+    - name: Import Fastfiles
+      run: |
+        echo "import '${{ github.action_path }}/android/Fastfile'" > android/fastlane/Fastfile
+        echo "import '${{ github.action_path }}/ios/Fastfile'" > ios/fastlane/Fastfile
       shell: bash
 
     - name: Deploy Android
       working-directory: android
       run: doppler run -- fastlane android ${{ inputs.lane }}
-      shell: bash
-
-    - name: Import iOS Fastfile
-      working-directory: ios
-      run: echo "import '${{ github.action_path }}/ios/Fastfile'" > fastlane/Fastfile
       shell: bash
 
     - name: Deploy iOS
