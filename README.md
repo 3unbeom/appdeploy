@@ -5,7 +5,7 @@ A GitHub Action to build and deploy Flutter apps via Fastlane.
 ## Usage
 
 ```yaml
-- uses: 3unbeom/flutter-deploy@v1
+- uses: 3unbeom/flutter-deploy@main
   with:
     platform: all
     lane: release
@@ -51,7 +51,7 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 
 | Name | Description |
 |------|-------------|
-| `SUPPLY_JSON_KEY_DATA` | Google Play service account JSON (also used by Firebase App Distribution) |
+| `SUPPLY_JSON_KEY_DATA` | Google Play service account JSON |
 
 ### Slack
 
