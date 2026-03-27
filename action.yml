@@ -24,10 +24,6 @@ runs:
       run: mise use gem:cocoapods@1
       shell: bash
 
-    - if: inputs.lane == 'beta'
-      run: mise use gem:fastlane-plugin-firebase_app_distribution@1
-      shell: bash
-
     - if: inputs.platform != 'ios'
       working-directory: android
       run: |
