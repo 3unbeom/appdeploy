@@ -44,6 +44,6 @@ runs:
       if: inputs.ios == 'true'
       working-directory: ios
       run: |
-        echo "import '${{ github.action_path }}/ios/Fastfile'" > fastlane/Fastfile
+        echo "import '${{ github.action_path }}/ios.rb'" > fastlane/Fastfile
         doppler run -- fastlane ios ${{ inputs.lane }}
       shell: bash
