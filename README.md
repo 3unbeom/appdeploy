@@ -53,15 +53,16 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 |------|-------------|
 | `SUPPLY_JSON_KEY_DATA` | Google Play service account JSON |
 
-### Cloudflare R2 (iOS beta)
+### S3 Storage (iOS beta)
 
 | Name | Description |
 |------|-------------|
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
-| `R2_ACCESS_KEY_ID` | R2 S3 API access key ID |
-| `R2_SECRET_ACCESS_KEY` | R2 S3 API secret access key |
-| `R2_BUCKET` | R2 bucket name |
-| `R2_PUBLIC_URL` | R2 public URL (custom domain or r2.dev) |
+| `S3_ENDPOINT` | S3-compatible endpoint URL |
+| `S3_ACCESS_KEY_ID` | Access key ID |
+| `S3_SECRET_ACCESS_KEY` | Secret access key |
+| `S3_BUCKET` | Bucket name |
+| `S3_PUBLIC_URL` | Public URL for downloads |
+| `S3_REGION` | Region (default: `auto`) |
 
 ### Slack
 
