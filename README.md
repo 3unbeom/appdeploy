@@ -53,11 +53,14 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 |------|-------------|
 | `SUPPLY_JSON_KEY_DATA` | Google Play service account JSON |
 
-### Diawi (iOS beta)
+### Cloudflare R2 (iOS beta)
 
 | Name | Description |
 |------|-------------|
-| `DIAWI_TOKEN` | Diawi API token |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (R2 read/write) |
+| `R2_BUCKET` | R2 bucket name |
+| `R2_PUBLIC_URL` | R2 public URL (custom domain or r2.dev) |
 
 ### Telegram
 

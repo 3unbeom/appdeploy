@@ -3,6 +3,48 @@ require "uri"
 
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
+def upload_to_r2(file:, key:, content_type: "application/octet-stream")
+  bucket = ENV["R2_BUCKET"]
+  sh("wrangler r2 object put #{bucket}/#{key} --file #{file} --content-type #{content_type}")
+  "#{ENV['R2_PUBLIC_URL']}/#{key}"
+end
+
+def generate_manifest(ipa_url:, bundle_id:, version:, title:)
+  <<~PLIST
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>items</key>
+      <array>
+        <dict>
+          <key>assets</key>
+          <array>
+            <dict>
+              <key>kind</key>
+              <string>software-package</string>
+              <key>url</key>
+              <string>#{ipa_url}</string>
+            </dict>
+          </array>
+          <key>metadata</key>
+          <dict>
+            <key>bundle-identifier</key>
+            <string>#{bundle_id}</string>
+            <key>bundle-version</key>
+            <string>#{version}</string>
+            <key>kind</key>
+            <string>software</string>
+            <key>title</key>
+            <string>#{title}</string>
+          </dict>
+        </dict>
+      </array>
+    </dict>
+    </plist>
+  PLIST
+end
+
 def notify_telegram(message:)
   token = ENV["TELEGRAM_BOT_TOKEN"]
   chat_id = ENV["TELEGRAM_CHAT_ID"]
@@ -59,9 +101,18 @@ platform :ios do
     setup_signing(type: type)
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
     ipa = File.expand_path(Dir.glob(IPA_PATH).first)
-    diawi(token: ENV["DIAWI_TOKEN"], file: ipa)
-    link = lane_context[SharedValues::UPLOADED_FILE_LINK_TO_DIAWI]
-    notify_telegram(message: "✅ *#{APP_IDENTIFIER}* iOS 베타 배포 완료\n#{link}")
+    version = YAML.load_file("../../pubspec.yaml")["version"].to_s.split("+").first
+    ipa_key = "ios/#{APP_IDENTIFIER}/#{version}/#{File.basename(ipa)}"
+    ipa_url = upload_to_r2(file: ipa, key: ipa_key)
+
+    manifest = generate_manifest(ipa_url: ipa_url, bundle_id: APP_IDENTIFIER, version: version, title: APP_IDENTIFIER)
+    manifest_path = File.join(Dir.tmpdir, "manifest.plist")
+    File.write(manifest_path, manifest)
+    manifest_key = "ios/#{APP_IDENTIFIER}/#{version}/manifest.plist"
+    manifest_url = upload_to_r2(file: manifest_path, key: manifest_key, content_type: "application/xml")
+
+    install_link = "itms-services://?action=download-manifest&url=#{manifest_url}"
+    notify_telegram(message: "✅ *#{APP_IDENTIFIER}* iOS 베타 배포 완료\n#{install_link}")
   end
 
   lane :release do
