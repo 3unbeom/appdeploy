@@ -1,3 +1,6 @@
+require "net/http"
+require "uri"
+
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
 def upload_to_r2(file:, key:, content_type: "application/octet-stream")
@@ -40,6 +43,15 @@ def generate_manifest(ipa_url:, bundle_id:, version:, title:)
     </dict>
     </plist>
   PLIST
+end
+
+def notify_telegram(message:)
+  token = ENV["TELEGRAM_BOT_TOKEN"]
+  chat_id = ENV["TELEGRAM_CHAT_ID"]
+  return unless token && chat_id
+
+  uri = URI("https://api.telegram.org/bot#{token}/sendMessage")
+  Net::HTTP.post_form(uri, chat_id: chat_id, text: message, parse_mode: "Markdown")
 end
 
 def certificate_name(match_type)
@@ -99,6 +111,8 @@ platform :ios do
     manifest_key = "ios/#{APP_IDENTIFIER}/#{version}/manifest.plist"
     manifest_url = upload_to_r2(file: manifest_path, key: manifest_key, content_type: "application/xml")
 
+    install_link = "itms-services://?action=download-manifest&url=#{manifest_url}"
+    notify_telegram(message: "✅ *#{APP_IDENTIFIER}* iOS 베타 배포 완료\n#{install_link}")
   end
 
   lane :release do
@@ -116,5 +130,10 @@ platform :ios do
       submit_for_review: true,
       reject_if_possible: true,
     )
+    notify_telegram(message: "✅ *#{APP_IDENTIFIER}* iOS 릴리스 배포 완료")
   end
+end
+
+error do |lane, exception|
+  notify_telegram(message: "❌ *#{APP_IDENTIFIER}* iOS 배포 실패\n`#{exception.message}`")
 end
