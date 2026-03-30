@@ -21,18 +21,28 @@ def upload_to_r2(file:, key:, content_type: "application/octet-stream")
   "#{ENV['R2_PUBLIC_URL']}/#{key}"
 end
 
-def generate_manifest(ipa_url:, bundle_id:, version:, title:)
-  {
+def r2_install_url(ipa:)
+  version = YAML.load_file("../../pubspec.yaml")["version"].to_s.split("+").first
+  prefix = "ios/#{APP_IDENTIFIER}/#{version}"
+
+  ipa_url = upload_to_r2(file: ipa, key: "#{prefix}/#{File.basename(ipa)}")
+
+  manifest = {
     "items" => [{
       "assets"   => [{ "kind" => "software-package", "url" => ipa_url }],
       "metadata" => {
-        "bundle-identifier" => bundle_id,
+        "bundle-identifier" => APP_IDENTIFIER,
         "bundle-version"    => version,
         "kind"              => "software",
-        "title"             => title,
+        "title"             => APP_IDENTIFIER,
       },
     }],
   }.to_plist
+  manifest_path = File.join(Dir.tmpdir, "manifest.plist")
+  File.write(manifest_path, manifest)
+  manifest_url = upload_to_r2(file: manifest_path, key: "#{prefix}/manifest.plist", content_type: "application/xml")
+
+  "itms-services://?action=download-manifest&url=#{manifest_url}"
 end
 
 def notify_telegram(message:)
@@ -91,17 +101,7 @@ platform :ios do
     setup_signing(type: type)
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
     ipa = File.expand_path(Dir.glob(IPA_PATH).first)
-    version = YAML.load_file("../../pubspec.yaml")["version"].to_s.split("+").first
-    ipa_key = "ios/#{APP_IDENTIFIER}/#{version}/#{File.basename(ipa)}"
-    ipa_url = upload_to_r2(file: ipa, key: ipa_key)
-
-    manifest = generate_manifest(ipa_url: ipa_url, bundle_id: APP_IDENTIFIER, version: version, title: APP_IDENTIFIER)
-    manifest_path = File.join(Dir.tmpdir, "manifest.plist")
-    File.write(manifest_path, manifest)
-    manifest_key = "ios/#{APP_IDENTIFIER}/#{version}/manifest.plist"
-    manifest_url = upload_to_r2(file: manifest_path, key: manifest_key, content_type: "application/xml")
-
-    install_link = "itms-services://?action=download-manifest&url=#{manifest_url}"
+    install_link = r2_install_url(ipa: ipa)
     slack
     notify_telegram(message: "✅ *#{APP_IDENTIFIER}* iOS 베타 배포 완료\n#{install_link}")
   end
