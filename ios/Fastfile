@@ -10,39 +10,17 @@ def upload_to_r2(file:, key:, content_type: "application/octet-stream")
 end
 
 def generate_manifest(ipa_url:, bundle_id:, version:, title:)
-  <<~PLIST
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-    <dict>
-      <key>items</key>
-      <array>
-        <dict>
-          <key>assets</key>
-          <array>
-            <dict>
-              <key>kind</key>
-              <string>software-package</string>
-              <key>url</key>
-              <string>#{ipa_url}</string>
-            </dict>
-          </array>
-          <key>metadata</key>
-          <dict>
-            <key>bundle-identifier</key>
-            <string>#{bundle_id}</string>
-            <key>bundle-version</key>
-            <string>#{version}</string>
-            <key>kind</key>
-            <string>software</string>
-            <key>title</key>
-            <string>#{title}</string>
-          </dict>
-        </dict>
-      </array>
-    </dict>
-    </plist>
-  PLIST
+  {
+    "items" => [{
+      "assets"   => [{ "kind" => "software-package", "url" => ipa_url }],
+      "metadata" => {
+        "bundle-identifier" => bundle_id,
+        "bundle-version"    => version,
+        "kind"              => "software",
+        "title"             => title,
+      },
+    }],
+  }.to_plist
 end
 
 def notify_telegram(message:)
