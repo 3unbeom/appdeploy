@@ -23,16 +23,19 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
     )
+    slack
     notify_telegram(message: "✅ *#{PACKAGE_NAME}* Android 베타 배포 완료")
   end
 
   lane :release do
     sh("cd ../.. && flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
     supply(aab: "../build/app/outputs/bundle/release/app-release.aab")
+    slack
     notify_telegram(message: "✅ *#{PACKAGE_NAME}* Android 릴리스 배포 완료")
   end
 end
 
 error do |lane, exception|
+  slack(message: exception.message, success: false)
   notify_telegram(message: "❌ *#{PACKAGE_NAME}* Android 배포 실패\n`#{exception.message}`")
 end

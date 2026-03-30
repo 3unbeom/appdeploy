@@ -62,6 +62,12 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 | `R2_BUCKET` | R2 bucket name |
 | `R2_PUBLIC_URL` | R2 public URL (custom domain or r2.dev) |
 
+### Slack
+
+| Name | Description |
+|------|-------------|
+| `SLACK_URL` | Slack webhook URL |
+
 ### Telegram
 
 | Name | Description |

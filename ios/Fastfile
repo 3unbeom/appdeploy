@@ -112,6 +112,7 @@ platform :ios do
     manifest_url = upload_to_r2(file: manifest_path, key: manifest_key, content_type: "application/xml")
 
     install_link = "itms-services://?action=download-manifest&url=#{manifest_url}"
+    slack
     notify_telegram(message: "✅ *#{APP_IDENTIFIER}* iOS 베타 배포 완료\n#{install_link}")
   end
 
@@ -130,10 +131,12 @@ platform :ios do
       submit_for_review: true,
       reject_if_possible: true,
     )
+    slack
     notify_telegram(message: "✅ *#{APP_IDENTIFIER}* iOS 릴리스 배포 완료")
   end
 end
 
 error do |lane, exception|
+  slack(message: exception.message, success: false)
   notify_telegram(message: "❌ *#{APP_IDENTIFIER}* iOS 배포 실패\n`#{exception.message}`")
 end
