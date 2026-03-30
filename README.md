@@ -61,10 +61,3 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token (R2 read/write) |
 | `R2_BUCKET` | R2 bucket name |
 | `R2_PUBLIC_URL` | R2 public URL (custom domain or r2.dev) |
-
-### Telegram
-
-| Name | Description |
-|------|-------------|
-| `TELEGRAM_BOT_TOKEN` | Telegram bot token |
-| `TELEGRAM_CHAT_ID` | Telegram chat ID to receive notifications |
