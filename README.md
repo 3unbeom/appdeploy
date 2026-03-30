@@ -62,7 +62,6 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 | `S3_SECRET_ACCESS_KEY` | Secret access key |
 | `S3_BUCKET` | Bucket name |
 | `S3_PUBLIC_URL` | Public URL for downloads |
-| `S3_REGION` | Region (default: `auto`) |
 
 ### Slack
 
