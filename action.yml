@@ -17,7 +17,7 @@ runs:
       with:
         cache: false
 
-    - run: mise use flutter@3 ruby@4 gem:fastlane@2
+    - run: mise use flutter@3 ruby@4 gem:fastlane@2 && fastlane add_plugin diawi
       shell: bash
 
     - if: inputs.platform != 'android'

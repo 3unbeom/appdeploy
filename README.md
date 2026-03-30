@@ -53,6 +53,12 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 |------|-------------|
 | `SUPPLY_JSON_KEY_DATA` | Google Play service account JSON |
 
+### Diawi (iOS beta)
+
+| Name | Description |
+|------|-------------|
+| `DIAWI_TOKEN` | Diawi API token |
+
 ### Telegram
 
 | Name | Description |
