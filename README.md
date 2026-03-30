@@ -53,8 +53,9 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 |------|-------------|
 | `SUPPLY_JSON_KEY_DATA` | Google Play service account JSON |
 
-### Slack
+### Telegram
 
 | Name | Description |
 |------|-------------|
-| `SLACK_URL` | Slack webhook URL |
+| `TELEGRAM_BOT_TOKEN` | Telegram bot token |
+| `TELEGRAM_CHAT_ID` | Telegram chat ID to receive notifications |

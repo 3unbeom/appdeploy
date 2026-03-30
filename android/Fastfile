@@ -1,3 +1,17 @@
+require "net/http"
+require "uri"
+
+PACKAGE_NAME = CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
+
+def notify_telegram(message:)
+  token = ENV["TELEGRAM_BOT_TOKEN"]
+  chat_id = ENV["TELEGRAM_CHAT_ID"]
+  return unless token && chat_id
+
+  uri = URI("https://api.telegram.org/bot#{token}/sendMessage")
+  Net::HTTP.post_form(uri, chat_id: chat_id, text: message, parse_mode: "Markdown")
+end
+
 platform :android do
   lane :beta do
     sh("cd ../.. && flutter build appbundle --build-number=#{google_play_track_version_codes(track: 'internal').max + 1}")
@@ -9,16 +23,16 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true,
     )
-    slack
+    notify_telegram(message: "✅ *#{PACKAGE_NAME}* Android 베타 배포 완료")
   end
 
   lane :release do
     sh("cd ../.. && flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
     supply(aab: "../build/app/outputs/bundle/release/app-release.aab")
-    slack
+    notify_telegram(message: "✅ *#{PACKAGE_NAME}* Android 릴리스 배포 완료")
   end
 end
 
 error do |lane, exception|
-  slack(message: exception.message, success: false)
+  notify_telegram(message: "❌ *#{PACKAGE_NAME}* Android 배포 실패\n`#{exception.message}`")
 end
