@@ -4,8 +4,20 @@ require "uri"
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
 def upload_to_r2(file:, key:, content_type: "application/octet-stream")
-  bucket = ENV["R2_BUCKET"]
-  sh("wrangler r2 object put #{bucket}/#{key} --file #{file} --content-type #{content_type}")
+  require "aws-sdk-s3"
+
+  client = Aws::S3::Client.new(
+    region: "auto",
+    endpoint: "https://#{ENV['CLOUDFLARE_ACCOUNT_ID']}.r2.cloudflarestorage.com",
+    access_key_id: ENV["R2_ACCESS_KEY_ID"],
+    secret_access_key: ENV["R2_SECRET_ACCESS_KEY"],
+  )
+  client.put_object(
+    bucket: ENV["R2_BUCKET"],
+    key: key,
+    body: File.open(file),
+    content_type: content_type,
+  )
   "#{ENV['R2_PUBLIC_URL']}/#{key}"
 end
 

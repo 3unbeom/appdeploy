@@ -58,7 +58,8 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 | Name | Description |
 |------|-------------|
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare API token (R2 read/write) |
+| `R2_ACCESS_KEY_ID` | R2 S3 API access key ID |
+| `R2_SECRET_ACCESS_KEY` | R2 S3 API secret access key |
 | `R2_BUCKET` | R2 bucket name |
 | `R2_PUBLIC_URL` | R2 public URL (custom domain or r2.dev) |
 
