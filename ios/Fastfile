@@ -1,3 +1,5 @@
+require "json"
+
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 
 def s3_client
