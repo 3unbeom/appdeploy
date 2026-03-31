@@ -73,9 +73,6 @@ IPA_PATH = "../../build/ios/ipa/*.ipa"
 platform :ios do
   before_all do
     setup_ci
-    if ENV["APP_STORE_CONNECT_API_KEY"]
-      app_store_connect_api_key(is_key_content_base64: true)
-    end
   end
 
   private_lane :setup_signing do |options|
