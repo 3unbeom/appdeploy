@@ -1,4 +1,6 @@
 PACKAGE_NAME = CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
+FLAVOR = ENV.fetch("FLAVOR", "")
+FLAVOR_FLAG = FLAVOR.empty? ? "" : " --flavor #{FLAVOR}"
 
 def s3_client
   require "aws-sdk-s3"
@@ -29,7 +31,7 @@ end
 
 platform :android do
   lane :beta do
-    sh("cd ../.. && flutter build apk")
+    sh("cd ../.. && flutter build apk#{FLAVOR_FLAG}")
     apk = File.expand_path("../../build/app/outputs/flutter-apk/app-release.apk")
     apk_url = s3_apk_url(apk: apk)
     telegram(text: apk_url)
@@ -37,7 +39,7 @@ platform :android do
   end
 
   lane :release do
-    sh("cd ../.. && flutter build appbundle --build-number=#{google_play_track_version_codes.max + 1}")
+    sh("cd ../.. && flutter build appbundle#{FLAVOR_FLAG} --build-number=#{google_play_track_version_codes.max + 1}")
     supply(aab: "../build/app/outputs/bundle/release/app-release.aab")
     slack
     telegram(text: "✅ *#{PACKAGE_NAME}* Android 릴리스 배포 완료")

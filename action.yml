@@ -8,6 +8,9 @@ inputs:
   lane:
     description: 'release, beta'
     default: 'release'
+  flavor:
+    description: 'Flutter flavor (e.g. production, beta). Omit to build without flavor.'
+    default: ''
 
 runs:
   using: 'composite'
@@ -31,6 +34,8 @@ runs:
         echo "gem 'fastlane-plugin-telegram'" > fastlane/Pluginfile
         doppler run -- fastlane android ${{ inputs.lane }}
       shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
 
     - if: inputs.platform != 'android'
       working-directory: ios
@@ -39,3 +44,5 @@ runs:
         echo "gem 'fastlane-plugin-telegram'" > fastlane/Pluginfile
         doppler run -- fastlane ios ${{ inputs.lane }}
       shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}

@@ -1,4 +1,6 @@
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+FLAVOR = ENV.fetch("FLAVOR", "")
+FLAVOR_FLAG = FLAVOR.empty? ? "" : " --flavor #{FLAVOR}"
 
 def s3_client
   require "aws-sdk-s3"
@@ -94,7 +96,7 @@ platform :ios do
   lane :beta do
     type = "adhoc"
     setup_signing(type: type)
-    sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
+    sh("cd ../.. && flutter build ipa#{FLAVOR_FLAG} --export-options-plist=#{generate_export_options(type)}")
     ipa = File.expand_path(Dir.glob(IPA_PATH).first)
     install_url = s3_install_url(ipa: ipa)
     telegram(text: install_url)
@@ -105,7 +107,7 @@ platform :ios do
     type = "appstore"
     setup_signing(type: type)
     build_number = latest_testflight_build_number + 1
-    sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)} --build-number=#{build_number}")
+    sh("cd ../.. && flutter build ipa#{FLAVOR_FLAG} --export-options-plist=#{generate_export_options(type)} --build-number=#{build_number}")
     deliver(
       ipa: File.expand_path(Dir.glob(IPA_PATH).first),
       app_version: YAML.load_file("../../pubspec.yaml")["version"].to_s.split("+").first,
