@@ -95,6 +95,13 @@ platform :ios do
   lane :beta do
     beta_id = "#{APP_IDENTIFIER}.beta"
 
+    # Apple Developer Portal에 beta App ID 등록 (없으면 생성)
+    produce(
+      app_identifier: beta_id,
+      app_name: "#{get_info_plist_value(path: 'Runner/Info.plist', key: 'CFBundleDisplayName')} Beta",
+      skip_itc: true,
+    )
+
     # 번들ID와 앱 이름을 beta용으로 변경
     update_app_identifier(
       xcodeproj: "Runner.xcodeproj",
