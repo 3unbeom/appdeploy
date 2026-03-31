@@ -81,7 +81,6 @@ platform :ios do
     match(
       type: type,
       app_identifier: app_id,
-      readonly: false,
       clone_branch_directly: true,
     )
     update_code_signing_settings(
