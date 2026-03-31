@@ -43,7 +43,10 @@ def s3_install_url(ipa:)
   File.write(manifest_path, manifest)
   manifest_url = upload_to_s3(file: manifest_path, key: "#{prefix}/manifest.plist", content_type: "application/xml")
 
-  "itms-services://?action=download-manifest&url=#{manifest_url}"
+  install_url = "itms-services://?action=download-manifest&url=#{manifest_url}"
+  redirect_path = File.join(Dir.tmpdir, "install.html")
+  File.write(redirect_path, "<html><head><meta http-equiv=\"refresh\" content=\"0;url=#{install_url}\"></head></html>")
+  upload_to_s3(file: redirect_path, key: "#{prefix}/install.html", content_type: "text/html")
 end
 
 def certificate_name(match_type)
@@ -93,19 +96,9 @@ platform :ios do
     setup_signing(type: type)
     sh("cd ../.. && flutter build ipa --export-options-plist=#{generate_export_options(type)}")
     ipa = File.expand_path(Dir.glob(IPA_PATH).first)
-    install_link = s3_install_url(ipa: ipa)
-    telegram(text: install_link)
-    slack(
-      attachments: [{
-        "fallback" => install_link,
-        "actions"  => [{
-          "type"  => "button",
-          "text"  => "📲 설치하기",
-          "url"   => install_link,
-          "style" => "primary",
-        }],
-      }],
-    )
+    install_url = s3_install_url(ipa: ipa)
+    telegram(text: install_url)
+    slack(message: install_url)
   end
 
   lane :release do
