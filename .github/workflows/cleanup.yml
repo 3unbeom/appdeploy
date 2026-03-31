@@ -1,0 +1,26 @@
+name: Cleanup old builds
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Every Monday at 00:00 UTC
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dopplerhq/cli-action@v4
+      - uses: jdx/mise-action@v4
+        with:
+          cache: false
+
+      - run: mise use ruby@4 gem:aws-sdk-s3
+        shell: bash
+
+      - run: doppler run -- ruby cleanup.rb
+        shell: bash
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          DOPPLER_PROJECT: deploy
+          DOPPLER_CONFIG: flutter
