@@ -24,9 +24,9 @@ end
 
 def s3_install_url(ipa:)
   version = YAML.load_file("../../pubspec.yaml")["version"].to_s.split("+").first
-  prefix = "ios/#{APP_IDENTIFIER}/#{version}"
+  slug = APP_IDENTIFIER.split(".").last
 
-  ipa_url = upload_to_s3(file: ipa, key: "#{prefix}/#{File.basename(ipa)}")
+  ipa_url = upload_to_s3(file: ipa, key: "#{slug}/app.ipa")
 
   manifest = {
     "items" => [{
@@ -41,12 +41,12 @@ def s3_install_url(ipa:)
   }.to_plist
   manifest_path = File.join(Dir.tmpdir, "manifest.plist")
   File.write(manifest_path, manifest)
-  manifest_url = upload_to_s3(file: manifest_path, key: "#{prefix}/manifest.plist", content_type: "application/xml")
+  manifest_url = upload_to_s3(file: manifest_path, key: "#{slug}/manifest.plist", content_type: "application/xml")
 
   install_url = "itms-services://?action=download-manifest&url=#{manifest_url}"
   redirect_path = File.join(Dir.tmpdir, "install.html")
   File.write(redirect_path, "<html><head><meta http-equiv=\"refresh\" content=\"0;url=#{install_url}\"></head></html>")
-  upload_to_s3(file: redirect_path, key: "#{prefix}/install.html", content_type: "text/html")
+  upload_to_s3(file: redirect_path, key: "#{slug}/install.html", content_type: "text/html")
 end
 
 def certificate_name(match_type)

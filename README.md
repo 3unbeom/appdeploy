@@ -74,5 +74,5 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 
 | Name | Description |
 |------|-------------|
-| `TELEGRAM_BOT_TOKEN` | Telegram bot token |
+| `TELEGRAM_TOKEN` | Telegram bot token |
 | `TELEGRAM_CHAT_ID` | Telegram chat ID to receive notifications |
