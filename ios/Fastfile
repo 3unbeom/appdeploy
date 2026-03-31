@@ -95,7 +95,17 @@ platform :ios do
     ipa = File.expand_path(Dir.glob(IPA_PATH).first)
     install_link = s3_install_url(ipa: ipa)
     telegram(text: install_link)
-    slack(message: install_link)
+    slack(
+      attachments: [{
+        "fallback" => install_link,
+        "actions"  => [{
+          "type"  => "button",
+          "text"  => "📲 설치하기",
+          "url"   => install_link,
+          "style" => "primary",
+        }],
+      }],
+    )
   end
 
   lane :release do
