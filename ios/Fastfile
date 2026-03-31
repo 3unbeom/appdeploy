@@ -46,7 +46,7 @@ def s3_install_url(ipa:)
   install_url = "itms-services://?action=download-manifest&url=#{manifest_url}"
   redirect_path = File.join(Dir.tmpdir, "install.html")
   File.write(redirect_path, "<html><head><meta http-equiv=\"refresh\" content=\"0;url=#{install_url}\"></head></html>")
-  upload_to_s3(file: redirect_path, key: "#{slug}/install.html", content_type: "text/html")
+  upload_to_s3(file: redirect_path, key: "#{slug}/ios", content_type: "text/html")
 end
 
 def certificate_name(match_type)
