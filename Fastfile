@@ -119,10 +119,14 @@ platform :ios do
       UI.success("App ID 생성 완료: #{beta_id}")
     end
 
-    update_info_plist(
+    update_app_identifier(
       xcodeproj: "Runner.xcodeproj",
       plist_path: "Runner/Info.plist",
       app_identifier: beta_id,
+    )
+    update_info_plist(
+      xcodeproj: "Runner.xcodeproj",
+      plist_path: "Runner/Info.plist",
       display_name: "#{display_name} Beta",
     )
 
