@@ -25,8 +25,8 @@ def upload_to_s3(file:, key:, content_type: "application/octet-stream")
   "#{ENV['S3_PUBLIC_URL']}/#{key}"
 end
 
-def s3_install_url(ipa:, app_id: APP_IDENTIFIER)
-  slug = app_id.split(".").last
+def s3_install_url(ipa:, app_id:)
+  slug = APP_IDENTIFIER.split(".").last
 
   ipa_url = upload_to_s3(file: ipa, key: "#{slug}/app.ipa")
 
@@ -38,7 +38,6 @@ def s3_install_url(ipa:, app_id: APP_IDENTIFIER)
           "bundle-identifier" => app_id,
           "bundle-version"    => "1.0",
           "kind"              => "software",
-          "title"             => app_id,
         },
       }],
     }),
