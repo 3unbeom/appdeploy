@@ -82,8 +82,12 @@ end
 IPA_PATH = "../../build/ios/ipa/*.ipa"
 
 platform :ios do
-  private_lane :setup_signing do |options|
+  before_all do
     setup_ci
+    app_store_connect_api_key if ENV["APP_STORE_CONNECT_API_KEY_KEY_ID"]
+  end
+
+  private_lane :setup_signing do |options|
     type = options[:type]
     app_id = options[:app_identifier] || APP_IDENTIFIER
     match(
