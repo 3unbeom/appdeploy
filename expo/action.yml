@@ -1,0 +1,26 @@
+name: Expo Deploy
+description: Build and deploy Expo apps via Fastlane
+
+inputs:
+  working-directory:
+    description: 'Working directory for run steps'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: dopplerhq/cli-action@v4
+    - uses: jdx/mise-action@v4
+      with:
+        cache: false
+
+    - run: mise use java@17 node@24 ruby gem:fastlane
+      shell: bash
+
+    - run: |
+        npm ci
+        echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
+        doppler run -- fastlane deploy
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
