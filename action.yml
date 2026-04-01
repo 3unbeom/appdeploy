@@ -17,7 +17,7 @@ runs:
       with:
         cache: false
 
-    - run: mise use flutter ruby gem:fastlane gem:cocoapods gem:aws-sdk-s3
+    - run: mise use flutter ruby gem:fastlane gem:cocoapods gem:aws-sdk-s3 gem:fastlane-plugin-telegram
       shell: bash
 
     - if: inputs.platform != 'ios'
