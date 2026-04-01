@@ -1,9 +1,4 @@
 app_json = JSON.parse(File.read("../app.json"))
-package = app_json["expo"]["android"]["package"]
-
-File.write("Appfile", <<~APPFILE)
-  package_name "#{package}"
-APPFILE
 
 lane :deploy do
   build_number = google_play_track_version_codes(track: "internal").max + 1
