@@ -1,3 +1,5 @@
+require 'fastlane/plugin/telegram'
+
 APP_IDENTIFIER = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
 PACKAGE_NAME   = CredentialsManager::AppfileConfig.try_fetch_value(:package_name)
 
