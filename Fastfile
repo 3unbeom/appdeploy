@@ -108,6 +108,16 @@ platform :ios do
     beta_id = "#{APP_IDENTIFIER}.beta"
     display_name = get_info_plist_value(path: "Runner/Info.plist", key: "CFBundleDisplayName")
 
+    # App ID 등록 (없으면 생성, 있으면 스킵)
+    unless Spaceship::ConnectAPI::BundleId.find(beta_id)
+      Spaceship::ConnectAPI::BundleId.create(
+        name: "#{display_name} Beta",
+        identifier: beta_id,
+        platform: Spaceship::ConnectAPI::BundleIdPlatform::IOS,
+      )
+      UI.success("App ID 생성 완료: #{beta_id}")
+    end
+
     update_info_plist(
       xcodeproj: "Runner.xcodeproj",
       plist_path: "Runner/Info.plist",
