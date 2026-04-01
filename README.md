@@ -53,7 +53,7 @@ echo 'app_identifier "com.example.app"' > ios/fastlane/Appfile
 |------|-------------|
 | `SUPPLY_JSON_KEY_DATA` | Google Play service account JSON |
 
-### S3 Storage (iOS beta)
+### S3 Storage (beta)
 
 | Name | Description |
 |------|-------------|
