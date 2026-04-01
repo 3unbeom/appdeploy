@@ -82,8 +82,21 @@ end
 IPA_PATH = "../../build/ios/ipa/*.ipa"
 
 platform :ios do
-  private_lane :setup_signing do |options|
+  before_all do
     setup_ci
+    if ENV["APP_STORE_CONNECT_API_KEY"]
+      key = JSON.parse(ENV["APP_STORE_CONNECT_API_KEY"])
+      app_store_connect_api_key(
+        key_id: key["key_id"],
+        issuer_id: key["issuer_id"],
+        key_content: key["key"],
+        is_key_content_base64: key["is_key_content_base64"] || false,
+      )
+    end
+  end
+
+  private_lane :setup_signing do |options|
+    # setup_ci는 before_all에서 실행됨
     type = options[:type]
     app_id = options[:app_identifier] || APP_IDENTIFIER
     match(
