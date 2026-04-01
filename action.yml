@@ -24,7 +24,6 @@ runs:
       working-directory: android
       run: |
         echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
-        echo "gem 'fastlane-plugin-telegram'" > fastlane/Pluginfile
         doppler run -- fastlane android ${{ inputs.lane }}
       shell: bash
 
@@ -32,6 +31,5 @@ runs:
       working-directory: ios
       run: |
         echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
-        echo "gem 'fastlane-plugin-telegram'" > fastlane/Pluginfile
         doppler run -- fastlane ios ${{ inputs.lane }}
       shell: bash
