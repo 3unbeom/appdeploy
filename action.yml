@@ -25,6 +25,7 @@ runs:
       run: |
         echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
         echo "gem 'fastlane-plugin-telegram'" > fastlane/Pluginfile
+        printf "source 'https://rubygems.org'\ngem 'fastlane'\neval_gemfile('fastlane/Pluginfile')\n" > Gemfile
         doppler run -- fastlane android ${{ inputs.lane }}
       shell: bash
 
@@ -33,5 +34,6 @@ runs:
       run: |
         echo "import '${{ github.action_path }}/Fastfile'" > fastlane/Fastfile
         echo "gem 'fastlane-plugin-telegram'" > fastlane/Pluginfile
+        printf "source 'https://rubygems.org'\ngem 'fastlane'\neval_gemfile('fastlane/Pluginfile')\n" > Gemfile
         doppler run -- fastlane ios ${{ inputs.lane }}
       shell: bash
