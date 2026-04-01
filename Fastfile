@@ -108,12 +108,6 @@ platform :ios do
     beta_id = "#{APP_IDENTIFIER}.beta"
     display_name = get_info_plist_value(path: "Runner/Info.plist", key: "CFBundleDisplayName")
 
-    produce(
-      app_identifier: beta_id,
-      app_name: "#{display_name} Beta",
-      skip_itc: true,
-    )
-
     update_info_plist(
       xcodeproj: "Runner.xcodeproj",
       plist_path: "Runner/Info.plist",
