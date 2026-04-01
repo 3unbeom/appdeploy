@@ -32,20 +32,21 @@ def s3_install_url(ipa:, app_id: APP_IDENTIFIER)
 
   ipa_url = upload_to_s3(file: ipa, key: "#{slug}/app.ipa")
 
-  manifest = {
-    "items" => [{
-      "assets"   => [{ "kind" => "software-package", "url" => ipa_url }],
-      "metadata" => {
-        "bundle-identifier" => app_id,
-        "bundle-version"    => "1.0",
-        "kind"              => "software",
-        "title"             => app_id,
-      },
-    }],
-  }.to_plist
-  manifest_path = File.join(Dir.tmpdir, "manifest.plist")
-  File.write(manifest_path, manifest)
-  manifest_url = upload_to_s3(file: manifest_path, key: "#{slug}/manifest.plist", content_type: "application/xml")
+  manifest_url = upload_to_s3(
+    file: write_tmp_plist("manifest.plist", {
+      "items" => [{
+        "assets"   => [{ "kind" => "software-package", "url" => ipa_url }],
+        "metadata" => {
+          "bundle-identifier" => app_id,
+          "bundle-version"    => "1.0",
+          "kind"              => "software",
+          "title"             => app_id,
+        },
+      }],
+    }),
+    key: "#{slug}/manifest.plist",
+    content_type: "application/xml",
+  )
 
   install_url = "itms-services://?action=download-manifest&url=#{manifest_url}"
   redirect_path = File.join(Dir.tmpdir, "install.html")
@@ -60,6 +61,12 @@ end
 
 # ── iOS ─────────────────────────────────────────────────────────────────────
 
+def write_tmp_plist(filename, data)
+  path = File.join(Dir.tmpdir, filename)
+  File.write(path, data.to_plist)
+  path
+end
+
 def certificate_name(match_type, app_id: APP_IDENTIFIER)
   ENV["sigh_#{app_id}_#{match_type}_certificate-name"]
 end
@@ -69,25 +76,19 @@ def profile_name(match_type, app_id: APP_IDENTIFIER)
 end
 
 def generate_export_options(match_type, app_id: APP_IDENTIFIER)
-  path = File.join(Dir.tmpdir, "ExportOptions.plist")
-  File.write(path, {
+  write_tmp_plist("ExportOptions.plist", {
     "method"               => lane_context[SharedValues::SIGH_PROFILE_TYPE],
     "signingStyle"         => "manual",
     "signingCertificate"   => certificate_name(match_type, app_id: app_id),
     "provisioningProfiles" => lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING],
-  }.to_plist)
-  path
+  })
 end
 
 IPA_PATH = "../../build/ios/ipa/*.ipa"
 
 platform :ios do
-  before_all do
-    setup_ci
-    app_store_connect_api_key if ENV["APP_STORE_CONNECT_API_KEY_KEY_ID"]
-  end
-
   private_lane :setup_signing do |options|
+    setup_ci
     type = options[:type]
     app_id = options[:app_identifier] || APP_IDENTIFIER
     match(
